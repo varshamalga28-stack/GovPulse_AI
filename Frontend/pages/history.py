@@ -5,33 +5,111 @@ from api import get_prediction_history
 
 
 st.title("📜 Prediction History")
-st.caption("View previous complaint predictions")
+
+st.subheader(
+    "View all previous complaint predictions"
+)
+
+st.divider()
+
 
 data = get_prediction_history()
+
+
+# ------------------------------------------------------------
+# Error
+# ------------------------------------------------------------
+
+if not isinstance(data, dict):
+
+    st.error("Invalid response received from backend.")
+    st.write(data)
+    st.stop()
+
 
 if "error" in data:
 
     st.error("Unable to load prediction history.")
-    st.code(data["error"])
+
+    st.code(
+        data.get("error", "Unknown error")
+    )
+
+    if "details" in data:
+        st.code(data["details"])
+
+    st.stop()
+
+
+# ------------------------------------------------------------
+# Extract history
+# ------------------------------------------------------------
+
+history = data.get(
+    "history",
+    []
+)
+
+
+total = data.get(
+    "total_predictions",
+    len(history)
+)
+
+
+st.metric(
+    "Total Predictions",
+    total
+)
+
+
+st.divider()
+
+
+if not history:
+
+    st.info(
+        "No prediction history found."
+    )
 
 else:
 
-    history = data.get("history", [])
+    df = pd.DataFrame(history)
 
-    if not history:
+    # Move important columns first
+    preferred_columns = [
+        "id",
+        "complaint_id",
+        "prediction",
+        "category",
+        "subcategory",
+        "department",
+        "severity",
+        "priority",
+        "sentiment",
+        "issue_type",
+        "product",
+        "confidence",
+        "predicted_at"
+    ]
 
-        st.info("No prediction history found.")
+    available_columns = [
+        col for col in preferred_columns
+        if col in df.columns
+    ]
 
-    else:
+    remaining_columns = [
+        col for col in df.columns
+        if col not in available_columns
+    ]
 
-        st.success(
-            f"Total predictions: {len(history)}"
-        )
+    df = df[
+        available_columns +
+        remaining_columns
+    ]
 
-        df = pd.DataFrame(history)
-
-        st.dataframe(
-            df,
-            use_container_width=True,
-            hide_index=True
-        )
+    st.dataframe(
+        df,
+        use_container_width=True,
+        hide_index=True
+    )
