@@ -1,0 +1,173 @@
+/* =========================================================
+   GOVPULSE AI - MAIN APPLICATION
+   ========================================================= */
+
+/* Main application background */
+.stApp {
+    background: #f5f7fb;
+}
+
+/* Main content area */
+.main .block-container {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.main-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: #0f4c81 !important;
+    margin-bottom: 0.2rem;
+}
+
+.sub-title {
+    font-size: 18px;
+    color: #555555 !important;
+    margin-top: 0;
+    margin-bottom: 2rem;
+}
+
+/* Make standard Streamlit headings visible */
+h1 {
+    color: #0f4c81 !important;
+}
+
+h2 {
+    color: #163a5f !important;
+}
+
+h3 {
+    color: #163a5f !important;
+}
+
+/* Normal text */
+p,
+label,
+.stMarkdown,
+.stCaption {
+    color: #333333;
+}
+
+/* =========================================================
+   METRIC CARDS
+   ========================================================= */
+
+.metric-card {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.15);
+    text-align: center;
+}
+
+/* =========================================================
+   PREDICTION CARD
+   ========================================================= */
+
+.prediction-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* =========================================================
+   SUCCESS CARD
+   ========================================================= */
+
+.success-card {
+    background: #d4edda;
+    border-radius: 15px;
+    padding: 15px;
+    color: #155724 !important;
+}
+
+/* =========================================================
+   DANGER CARD
+   ========================================================= */
+
+.danger-card {
+    background: #f8d7da;
+    border-radius: 15px;
+    padding: 15px;
+    color: #721c24 !important;
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+section[data-testid="stSidebar"] {
+    background: #0f4c81;
+}
+
+section[data-testid="stSidebar"] * {
+    color: #ffffff !important;
+}
+
+/* Sidebar navigation */
+section[data-testid="stSidebar"] a {
+    color: #ffffff !important;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.stButton > button {
+    width: 100%;
+    border-radius: 10px;
+    height: 45px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* =========================================================
+   INPUTS
+   ========================================================= */
+
+.stTextInput input,
+.stTextArea textarea {
+    background-color: #ffffff !important;
+    color: #222222 !important;
+    border-radius: 8px;
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+[data-testid="stDataFrame"] {
+    border-radius: 12px;
+}
+
+/* =========================================================
+   METRICS
+   ========================================================= */
+
+[data-testid="stMetric"] {
+    background: #ffffff;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.10);
+}
+
+[data-testid="stMetricLabel"] {
+    color: #555555 !important;
+}
+
+[data-testid="stMetricValue"] {
+    color: #0f4c81 !important;
+}
+
+/* =========================================================
+   ALERTS
+   ========================================================= */
+
+.stAlert {
+    border-radius: 10px;
+}
