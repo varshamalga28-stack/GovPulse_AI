@@ -3,57 +3,29 @@ from config import BASE_URL
 
 
 # ============================================================
-# Analytics
+# Helper function
 # ============================================================
 
-def get_analytics():
+def _get_json(response):
+    """
+    Safely convert a response to JSON.
+    Prevents JSON decode errors when Render returns
+    an empty/non-JSON response.
+    """
+
     try:
-        response = requests.get(
-            f"{BASE_URL}/api/analytics",
-            timeout=30
-        )
+        return response.json()
 
-        if response.status_code == 200:
-            return response.json()
-
+    except ValueError:
         return {
-            "error": f"Server Error ({response.status_code})",
-            "details": response.text
-        }
-
-    except requests.exceptions.RequestException as e:
-        return {
-            "error": str(e)
+            "error": f"Backend returned non-JSON response "
+                     f"(HTTP {response.status_code})",
+            "response_text": response.text[:500]
         }
 
 
 # ============================================================
-# Prediction History
-# ============================================================
-
-def get_prediction_history():
-    try:
-        response = requests.get(
-            f"{BASE_URL}/api/predictions/history",
-            timeout=30
-        )
-
-        if response.status_code == 200:
-            return response.json()
-
-        return {
-            "error": f"Server Error ({response.status_code})",
-            "details": response.text
-        }
-
-    except requests.exceptions.RequestException as e:
-        return {
-            "error": str(e)
-        }
-
-
-# ============================================================
-# Emergency Prediction
+# Prediction
 # ============================================================
 
 def predict_complaint(
@@ -71,83 +43,136 @@ def predict_complaint(
     }
 
     try:
+
         response = requests.post(
             f"{BASE_URL}/api/predict",
             json=data,
             timeout=60
         )
 
-        if response.status_code == 200:
-            return response.json()
-
-        return {
-            "error": f"Server Error ({response.status_code})",
-            "details": response.text
-        }
+        return _get_json(response)
 
     except requests.exceptions.RequestException as e:
+
+        return {
+            "error": f"Backend connection error: {str(e)}"
+        }
+
+    except Exception as e:
+
         return {
             "error": str(e)
         }
 
 
 # ============================================================
-# Get Feedback
+# Prediction History
+# ============================================================
+
+def get_prediction_history():
+
+    try:
+
+        response = requests.get(
+            f"{BASE_URL}/api/predictions/history",
+            timeout=30
+        )
+
+        return _get_json(response)
+
+    except requests.exceptions.RequestException as e:
+
+        return {
+            "error": f"Backend connection error: {str(e)}"
+        }
+
+    except Exception as e:
+
+        return {
+            "error": str(e)
+        }
+
+
+# ============================================================
+# Analytics
+# ============================================================
+
+def get_analytics():
+
+    try:
+
+        response = requests.get(
+            f"{BASE_URL}/api/analytics",
+            timeout=30
+        )
+
+        return _get_json(response)
+
+    except requests.exceptions.RequestException as e:
+
+        return {
+            "error": f"Backend connection error: {str(e)}"
+        }
+
+    except Exception as e:
+
+        return {
+            "error": str(e)
+        }
+
+
+# ============================================================
+# Feedback - GET
 # ============================================================
 
 def get_feedback():
+
     try:
+
         response = requests.get(
             f"{BASE_URL}/api/feedback",
             timeout=30
         )
 
-        if response.status_code == 200:
-            return response.json()
-
-        return {
-            "error": f"Server Error ({response.status_code})",
-            "details": response.text
-        }
+        return _get_json(response)
 
     except requests.exceptions.RequestException as e:
+
+        return {
+            "error": f"Backend connection error: {str(e)}"
+        }
+
+    except Exception as e:
+
         return {
             "error": str(e)
         }
 
 
 # ============================================================
-# Submit Feedback
+# Feedback - POST
 # ============================================================
 
-def submit_feedback(
-    prediction_id,
-    rating,
-    feedback
-):
-
-    data = {
-        "prediction_id": prediction_id,
-        "rating": rating,
-        "feedback": feedback
-    }
+def submit_feedback(data):
 
     try:
+
         response = requests.post(
             f"{BASE_URL}/api/feedback",
             json=data,
             timeout=30
         )
 
-        if response.status_code in [200, 201]:
-            return response.json()
-
-        return {
-            "error": f"Server Error ({response.status_code})",
-            "details": response.text
-        }
+        return _get_json(response)
 
     except requests.exceptions.RequestException as e:
+
+        return {
+            "error": f"Backend connection error: {str(e)}"
+        }
+
+    except Exception as e:
+
         return {
             "error": str(e)
         }
