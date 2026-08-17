@@ -1,6 +1,6 @@
 # Backend API URL
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "https://govpulse-ai-2.onrender.com"
 
 # Streamlit Page
 
