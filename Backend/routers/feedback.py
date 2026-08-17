@@ -1,41 +1,30 @@
 from fastapi import APIRouter
-from schemas import FeedbackRequest
-from database import save_feedback, get_feedback
+
+from database import (
+    get_feedback,
+    save_feedback
+)
 
 
 router = APIRouter(
-    prefix="/api/feedback",
+    prefix="/api",
     tags=["Feedback"]
 )
 
 
-# ============================================================
-# Get all feedback
-# ============================================================
+@router.get("/feedback")
+def get_all_feedback():
 
-@router.get("")
-def feedback_list():
-
-    data = get_feedback()
+    feedback = get_feedback()
 
     return {
-        "total_feedback": len(data),
-        "feedback": data
+        "total_feedback": len(feedback),
+        "feedback": feedback
     }
 
 
-# ============================================================
-# Submit feedback
-# ============================================================
-
-@router.post("")
-def submit_feedback(request: FeedbackRequest):
-
-    data = {
-        "prediction_id": request.prediction_id,
-        "rating": request.rating,
-        "feedback": request.feedback
-    }
+@router.post("/feedback")
+def create_feedback(data: dict):
 
     result = save_feedback(data)
 
