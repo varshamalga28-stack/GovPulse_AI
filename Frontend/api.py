@@ -7,18 +7,21 @@ from config import BASE_URL
 # ============================================================
 
 def get_analytics():
-
     try:
-
         response = requests.get(
             f"{BASE_URL}/api/analytics",
             timeout=30
         )
 
-        return response.json()
+        if response.status_code == 200:
+            return response.json()
 
-    except Exception as e:
+        return {
+            "error": f"Server Error ({response.status_code})",
+            "details": response.text
+        }
 
+    except requests.exceptions.RequestException as e:
         return {
             "error": str(e)
         }
@@ -29,18 +32,21 @@ def get_analytics():
 # ============================================================
 
 def get_prediction_history():
-
     try:
-
         response = requests.get(
             f"{BASE_URL}/api/predictions/history",
             timeout=30
         )
 
-        return response.json()
+        if response.status_code == 200:
+            return response.json()
 
-    except Exception as e:
+        return {
+            "error": f"Server Error ({response.status_code})",
+            "details": response.text
+        }
 
+    except requests.exceptions.RequestException as e:
         return {
             "error": str(e)
         }
@@ -65,17 +71,46 @@ def predict_complaint(
     }
 
     try:
-
         response = requests.post(
             f"{BASE_URL}/api/predict",
             json=data,
             timeout=60
         )
 
-        return response.json()
+        if response.status_code == 200:
+            return response.json()
 
-    except Exception as e:
+        return {
+            "error": f"Server Error ({response.status_code})",
+            "details": response.text
+        }
 
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": str(e)
+        }
+
+
+# ============================================================
+# Get Feedback
+# ============================================================
+
+def get_feedback():
+    try:
+        response = requests.get(
+            f"{BASE_URL}/api/feedback",
+            timeout=30
+        )
+
+        if response.status_code == 200:
+            return response.json()
+
+        return {
+            "error": f"Server Error ({response.status_code})",
+            "details": response.text
+        }
+
+    except requests.exceptions.RequestException as e:
         return {
             "error": str(e)
         }
@@ -98,17 +133,21 @@ def submit_feedback(
     }
 
     try:
-
         response = requests.post(
             f"{BASE_URL}/api/feedback",
             json=data,
             timeout=30
         )
 
-        return response.json()
+        if response.status_code in [200, 201]:
+            return response.json()
 
-    except Exception as e:
+        return {
+            "error": f"Server Error ({response.status_code})",
+            "details": response.text
+        }
 
+    except requests.exceptions.RequestException as e:
         return {
             "error": str(e)
         }
