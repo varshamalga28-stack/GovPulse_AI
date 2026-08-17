@@ -3,24 +3,95 @@ from config import BASE_URL
 
 
 # ============================================================
-# Helper function
+# Common GET request
 # ============================================================
 
-def _get_json(response):
-    """
-    Safely convert a response to JSON.
-    Prevents JSON decode errors when Render returns
-    an empty/non-JSON response.
-    """
-
+def safe_get(endpoint):
     try:
-        return response.json()
+        response = requests.get(
+            f"{BASE_URL}{endpoint}",
+            timeout=60
+        )
 
-    except ValueError:
+        print("GET:", endpoint)
+        print("STATUS:", response.status_code)
+        print("RESPONSE:", response.text[:500])
+
+        if response.status_code != 200:
+            return {
+                "error": f"Backend returned HTTP {response.status_code}",
+                "details": response.text
+            }
+
+        if not response.text.strip():
+            return {
+                "error": "Backend returned an empty response"
+            }
+
+        try:
+            return response.json()
+
+        except ValueError:
+            return {
+                "error": "Backend returned invalid JSON",
+                "details": response.text[:500]
+            }
+
+    except requests.exceptions.RequestException as e:
         return {
-            "error": f"Backend returned non-JSON response "
-                     f"(HTTP {response.status_code})",
-            "response_text": response.text[:500]
+            "error": f"Cannot connect to backend: {str(e)}"
+        }
+
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
+
+
+# ============================================================
+# Common POST request
+# ============================================================
+
+def safe_post(endpoint, data):
+    try:
+        response = requests.post(
+            f"{BASE_URL}{endpoint}",
+            json=data,
+            timeout=60
+        )
+
+        print("POST:", endpoint)
+        print("STATUS:", response.status_code)
+        print("RESPONSE:", response.text[:500])
+
+        if response.status_code not in [200, 201]:
+            return {
+                "error": f"Backend returned HTTP {response.status_code}",
+                "details": response.text
+            }
+
+        if not response.text.strip():
+            return {
+                "error": "Backend returned an empty response"
+            }
+
+        try:
+            return response.json()
+
+        except ValueError:
+            return {
+                "error": "Backend returned invalid JSON",
+                "details": response.text[:500]
+            }
+
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": f"Cannot connect to backend: {str(e)}"
+        }
+
+    except Exception as e:
+        return {
+            "error": str(e)
         }
 
 
@@ -42,27 +113,10 @@ def predict_complaint(
         "phone": phone
     }
 
-    try:
-
-        response = requests.post(
-            f"{BASE_URL}/api/predict",
-            json=data,
-            timeout=60
-        )
-
-        return _get_json(response)
-
-    except requests.exceptions.RequestException as e:
-
-        return {
-            "error": f"Backend connection error: {str(e)}"
-        }
-
-    except Exception as e:
-
-        return {
-            "error": str(e)
-        }
+    return safe_post(
+        "/api/predict",
+        data
+    )
 
 
 # ============================================================
@@ -71,26 +125,9 @@ def predict_complaint(
 
 def get_prediction_history():
 
-    try:
-
-        response = requests.get(
-            f"{BASE_URL}/api/predictions/history",
-            timeout=30
-        )
-
-        return _get_json(response)
-
-    except requests.exceptions.RequestException as e:
-
-        return {
-            "error": f"Backend connection error: {str(e)}"
-        }
-
-    except Exception as e:
-
-        return {
-            "error": str(e)
-        }
+    return safe_get(
+        "/api/predictions/history"
+    )
 
 
 # ============================================================
@@ -99,80 +136,39 @@ def get_prediction_history():
 
 def get_analytics():
 
-    try:
-
-        response = requests.get(
-            f"{BASE_URL}/api/analytics",
-            timeout=30
-        )
-
-        return _get_json(response)
-
-    except requests.exceptions.RequestException as e:
-
-        return {
-            "error": f"Backend connection error: {str(e)}"
-        }
-
-    except Exception as e:
-
-        return {
-            "error": str(e)
-        }
+    return safe_get(
+        "/api/analytics"
+    )
 
 
 # ============================================================
-# Feedback - GET
+# Feedback
 # ============================================================
 
 def get_feedback():
 
-    try:
-
-        response = requests.get(
-            f"{BASE_URL}/api/feedback",
-            timeout=30
-        )
-
-        return _get_json(response)
-
-    except requests.exceptions.RequestException as e:
-
-        return {
-            "error": f"Backend connection error: {str(e)}"
-        }
-
-    except Exception as e:
-
-        return {
-            "error": str(e)
-        }
+    return safe_get(
+        "/api/feedback"
+    )
 
 
 # ============================================================
-# Feedback - POST
+# Submit Feedback
 # ============================================================
 
-def submit_feedback(data):
+def submit_feedback(
+    prediction_id,
+    rating,
+    feedback
+):
 
-    try:
+    data = {
+        "prediction_id": prediction_id,
+        "rating": rating,
+        "feedback": feedback
+    }
 
-        response = requests.post(
-            f"{BASE_URL}/api/feedback",
-            json=data,
-            timeout=30
-        )
-
-        return _get_json(response)
-
-    except requests.exceptions.RequestException as e:
-
-        return {
-            "error": f"Backend connection error: {str(e)}"
-        }
-
-    except Exception as e:
-
-        return {
-            "error": str(e)
-        }
+    return safe_post(
+        "/api/feedback",
+        data
+    )
