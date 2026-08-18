@@ -1,51 +1,20 @@
 import requests
+
 from config import BASE_URL
 
 
 # ============================================================
-# Helper function
+# BACKEND CONNECTION
 # ============================================================
 
-def _get_json(endpoint, timeout=60):
+def check_backend():
+    """
+    Check whether the FastAPI backend is reachable.
+    """
     try:
-        url = f"{BASE_URL}{endpoint}"
-
         response = requests.get(
-            url,
-            timeout=timeout,
-            headers={
-                "Accept": "application/json"
-            }
-        )
-
-        response.raise_for_status()
-
-        # Check whether the response actually contains JSON
-        try:
-            return response.json()
-        except ValueError:
-            return {
-                "error": f"Backend returned non-JSON response: {response.text[:500]}"
-            }
-
-    except requests.exceptions.RequestException as e:
-        return {
-            "error": f"Backend connection error: {str(e)}"
-        }
-
-
-def _post_json(endpoint, data, timeout=60):
-    try:
-        url = f"{BASE_URL}{endpoint}"
-
-        response = requests.post(
-            url,
-            json=data,
-            timeout=timeout,
-            headers={
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            }
+            f"{BASE_URL}/",
+            timeout=30
         )
 
         response.raise_for_status()
@@ -54,45 +23,84 @@ def _post_json(endpoint, data, timeout=60):
             return response.json()
         except ValueError:
             return {
-                "error": f"Backend returned non-JSON response: {response.text[:500]}"
+                "message": response.text
             }
 
     except requests.exceptions.RequestException as e:
         return {
-            "error": f"Backend connection error: {str(e)}"
+            "error": str(e)
         }
 
 
 # ============================================================
-# Analytics
+# ANALYTICS
 # ============================================================
 
 def get_analytics():
-    return _get_json("/api/analytics")
+
+    try:
+
+        response = requests.get(
+            f"{BASE_URL}/api/analytics",
+            timeout=60
+        )
+
+        response.raise_for_status()
+
+        try:
+            return response.json()
+
+        except ValueError:
+
+            return {
+                "error": (
+                    "Backend returned a non-JSON response. "
+                    f"Status: {response.status_code}"
+                )
+            }
+
+    except requests.exceptions.RequestException as e:
+
+        return {
+            "error": str(e)
+        }
 
 
 # ============================================================
-# Prediction History
+# PREDICTION HISTORY
 # ============================================================
 
 def get_prediction_history():
-    return _get_json("/api/predictions/history")
+
+    try:
+
+        response = requests.get(
+            f"{BASE_URL}/api/predictions/history",
+            timeout=60
+        )
+
+        response.raise_for_status()
+
+        try:
+            return response.json()
+
+        except ValueError:
+
+            return {
+                "error": (
+                    "Backend returned a non-JSON response."
+                )
+            }
+
+    except requests.exceptions.RequestException as e:
+
+        return {
+            "error": str(e)
+        }
 
 
 # ============================================================
-# Feedback
-# ============================================================
-
-def get_feedback():
-    return _get_json("/api/feedback")
-
-
-def submit_feedback(data):
-    return _post_json("/api/feedback", data)
-
-
-# ============================================================
-# Prediction
+# PREDICTION
 # ============================================================
 
 def predict_complaint(
@@ -109,8 +117,106 @@ def predict_complaint(
         "phone": phone
     }
 
-    return _post_json(
-        "/api/predict",
-        data,
-        timeout=120
-    )
+    try:
+
+        response = requests.post(
+            f"{BASE_URL}/api/predict",
+            json=data,
+            timeout=60
+        )
+
+        response.raise_for_status()
+
+        try:
+            return response.json()
+
+        except ValueError:
+
+            return {
+                "error": (
+                    "Backend returned a non-JSON response."
+                )
+            }
+
+    except requests.exceptions.RequestException as e:
+
+        return {
+            "error": str(e)
+        }
+
+
+# ============================================================
+# FEEDBACK
+# ============================================================
+
+def get_feedback():
+
+    try:
+
+        response = requests.get(
+            f"{BASE_URL}/api/feedback",
+            timeout=60
+        )
+
+        response.raise_for_status()
+
+        try:
+            return response.json()
+
+        except ValueError:
+
+            return {
+                "error": (
+                    "Backend returned a non-JSON response."
+                )
+            }
+
+    except requests.exceptions.RequestException as e:
+
+        return {
+            "error": str(e)
+        }
+
+
+# ============================================================
+# SUBMIT FEEDBACK
+# ============================================================
+
+def submit_feedback(
+    prediction_id,
+    rating,
+    comments
+):
+
+    data = {
+        "prediction_id": prediction_id,
+        "rating": rating,
+        "comments": comments
+    }
+
+    try:
+
+        response = requests.post(
+            f"{BASE_URL}/api/feedback",
+            json=data,
+            timeout=60
+        )
+
+        response.raise_for_status()
+
+        try:
+            return response.json()
+
+        except ValueError:
+
+            return {
+                "error": (
+                    "Backend returned a non-JSON response."
+                )
+            }
+
+    except requests.exceptions.RequestException as e:
+
+        return {
+            "error": str(e)
+        }
