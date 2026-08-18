@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 from services.analytics_service import get_dashboard_data
 
@@ -12,4 +12,13 @@ router = APIRouter(
 @router.get("/analytics")
 def analytics():
 
-    return get_dashboard_data()
+    data = get_dashboard_data()
+
+    if "error" in data:
+
+        raise HTTPException(
+            status_code=500,
+            detail=data
+        )
+
+    return data
