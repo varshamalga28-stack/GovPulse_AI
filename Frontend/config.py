@@ -1,6 +1,6 @@
 # Backend API URL
 
-BASE_URL = "https://govpulse-ai-2.onrender.com"
+BASE_URL = "https://govpulse-ai-backend.onrender.com"
 
 # Streamlit Page
 
