@@ -7,47 +7,63 @@ from database import (
 
 def get_dashboard_data():
 
-    complaints = get_complaints()
+    try:
 
-    predictions = get_predictions()
+        # -----------------------------------------
+        # GET DATA FROM SUPABASE
+        # -----------------------------------------
 
-    feedback = get_feedback()
+        complaints = get_complaints()
+        predictions = get_predictions()
+        feedback = get_feedback()
 
+        # -----------------------------------------
+        # SAFETY CHECK
+        # -----------------------------------------
 
-    emergency = 0
+        if complaints is None:
+            complaints = []
 
-    non_emergency = 0
+        if predictions is None:
+            predictions = []
 
+        if feedback is None:
+            feedback = []
 
-    for item in predictions:
+        # -----------------------------------------
+        # EMERGENCY COUNTS
+        # -----------------------------------------
 
-        prediction = item.get(
-            "prediction"
-        )
+        emergency = 0
+        non_emergency = 0
 
-        if prediction == 1:
+        for item in predictions:
 
-            emergency += 1
+            prediction = item.get("prediction")
 
-        else:
+            if str(prediction) == "1":
+                emergency += 1
 
-            non_emergency += 1
+            else:
+                non_emergency += 1
 
+        # -----------------------------------------
+        # RETURN DASHBOARD DATA
+        # -----------------------------------------
 
-    return {
+        return {
+            "total_complaints": len(complaints),
+            "total_predictions": len(predictions),
+            "total_feedback": len(feedback),
+            "emergency_cases": emergency,
+            "non_emergency_cases": non_emergency
+        }
 
-        "total_complaints":
-            len(complaints),
+    except Exception as e:
 
-        "total_predictions":
-            len(predictions),
+        print("ANALYTICS ERROR:", repr(e))
 
-        "total_feedback":
-            len(feedback),
-
-        "emergency_cases":
-            emergency,
-
-        "non_emergency_cases":
-            non_emergency
-    }
+        return {
+            "error": "Analytics service failed",
+            "details": str(e)
+        }
