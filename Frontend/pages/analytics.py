@@ -1,19 +1,13 @@
 import streamlit as st
-import pandas as pd
-import plotly.express as px
-
 from api import get_analytics
 
 
 st.title("📊 Analytics")
 
-st.subheader(
-    "GovPulse AI Complaint Analytics"
-)
-
-st.divider()
+st.write("Government Complaint Analytics")
 
 
+# Get analytics data
 data = get_analytics()
 
 
@@ -23,9 +17,7 @@ data = get_analytics()
 
 if not isinstance(data, dict):
 
-    st.error(
-        "Invalid analytics response."
-    )
+    st.error("Invalid response received from backend.")
 
     st.write(data)
 
@@ -34,113 +26,82 @@ if not isinstance(data, dict):
 
 if "error" in data:
 
-    st.error(
-        "Unable to load analytics."
-    )
+    st.error("Dashboard could not connect to the backend.")
 
-    st.code(
-        data.get("error", "Unknown error")
-    )
-
-    if "details" in data:
-        st.code(data["details"])
+    st.code(data["error"])
 
     st.stop()
 
 
 # ------------------------------------------------------------
-# Values
+# Read values
 # ------------------------------------------------------------
 
-total_complaints = data.get(
-    "total_complaints",
-    0
-)
-
-total_predictions = data.get(
-    "total_predictions",
-    0
-)
-
-total_feedback = data.get(
-    "total_feedback",
-    0
-)
-
-emergency_cases = data.get(
-    "emergency_cases",
-    0
-)
-
-non_emergency_cases = data.get(
-    "non_emergency_cases",
-    0
-)
+total_complaints = data.get("total_complaints", 0)
+total_predictions = data.get("total_predictions", 0)
+total_feedback = data.get("total_feedback", 0)
+emergency_cases = data.get("emergency_cases", 0)
+non_emergency_cases = data.get("non_emergency_cases", 0)
 
 
 # ------------------------------------------------------------
 # Metrics
 # ------------------------------------------------------------
 
-c1, c2, c3 = st.columns(3)
+col1, col2, col3 = st.columns(3)
 
-c1.metric(
-    "Total Complaints",
-    total_complaints
-)
+with col1:
+    st.metric(
+        "Total Complaints",
+        total_complaints
+    )
 
-c2.metric(
-    "Predictions",
-    total_predictions
-)
+with col2:
+    st.metric(
+        "Total Predictions",
+        total_predictions
+    )
 
-c3.metric(
-    "Feedback",
-    total_feedback
-)
+with col3:
+    st.metric(
+        "Total Feedback",
+        total_feedback
+    )
 
 
 st.divider()
 
 
-# ------------------------------------------------------------
-# Emergency chart
-# ------------------------------------------------------------
+col4, col5 = st.columns(2)
 
-chart_data = pd.DataFrame({
-    "Type": [
-        "Emergency",
-        "Non-Emergency"
-    ],
-    "Count": [
-        emergency_cases,
+with col4:
+    st.metric(
+        "Emergency Cases",
+        emergency_cases
+    )
+
+with col5:
+    st.metric(
+        "Non-Emergency Cases",
         non_emergency_cases
-    ]
-})
+    )
 
 
-fig = px.bar(
-    chart_data,
-    x="Type",
-    y="Count",
-    title="Emergency vs Non-Emergency Complaints",
-    text="Count"
-)
+# ------------------------------------------------------------
+# Summary
+# ------------------------------------------------------------
 
+st.subheader("📈 Prediction Summary")
 
-st.plotly_chart(
-    fig,
-    use_container_width=True
-)
+if total_predictions > 0:
 
+    chart_data = {
+        "Emergency": emergency_cases,
+        "Non-Emergency": non_emergency_cases
+    }
 
-st.divider()
+    st.bar_chart(chart_data)
 
+else:
 
-st.subheader("Prediction Summary")
-
-st.dataframe(
-    chart_data,
-    use_container_width=True,
-    hide_index=True
-)
+    st.info("No predictions available yet.")
