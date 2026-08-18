@@ -2,110 +2,12 @@ import requests
 from config import BASE_URL
 
 
-# ============================================================
-# Common GET request
-# ============================================================
-
-def safe_get(endpoint):
-    try:
-        response = requests.get(
-            f"{BASE_URL}{endpoint}",
-            timeout=60
-        )
-
-        print("GET:", endpoint)
-        print("STATUS:", response.status_code)
-        print("RESPONSE:", response.text[:500])
-
-        if response.status_code != 200:
-            return {
-                "error": f"Backend returned HTTP {response.status_code}",
-                "details": response.text
-            }
-
-        if not response.text.strip():
-            return {
-                "error": "Backend returned an empty response"
-            }
-
-        try:
-            return response.json()
-
-        except ValueError:
-            return {
-                "error": "Backend returned invalid JSON",
-                "details": response.text[:500]
-            }
-
-    except requests.exceptions.RequestException as e:
-        return {
-            "error": f"Cannot connect to backend: {str(e)}"
-        }
-
-    except Exception as e:
-        return {
-            "error": str(e)
-        }
-
-
-# ============================================================
-# Common POST request
-# ============================================================
-
-def safe_post(endpoint, data):
-    try:
-        response = requests.post(
-            f"{BASE_URL}{endpoint}",
-            json=data,
-            timeout=60
-        )
-
-        print("POST:", endpoint)
-        print("STATUS:", response.status_code)
-        print("RESPONSE:", response.text[:500])
-
-        if response.status_code not in [200, 201]:
-            return {
-                "error": f"Backend returned HTTP {response.status_code}",
-                "details": response.text
-            }
-
-        if not response.text.strip():
-            return {
-                "error": "Backend returned an empty response"
-            }
-
-        try:
-            return response.json()
-
-        except ValueError:
-            return {
-                "error": "Backend returned invalid JSON",
-                "details": response.text[:500]
-            }
-
-    except requests.exceptions.RequestException as e:
-        return {
-            "error": f"Cannot connect to backend: {str(e)}"
-        }
-
-    except Exception as e:
-        return {
-            "error": str(e)
-        }
-
-
-# ============================================================
-# Prediction
-# ============================================================
-
 def predict_complaint(
     complaint,
     customer_name,
     email,
     phone
 ):
-
     data = {
         "complaint": complaint,
         "customer_name": customer_name,
@@ -113,62 +15,86 @@ def predict_complaint(
         "phone": phone
     }
 
-    return safe_post(
-        "/api/predict",
-        data
-    )
+    try:
+        response = requests.post(
+            f"{BASE_URL}/api/predict",
+            json=data,
+            timeout=60
+        )
 
+        response.raise_for_status()
+        return response.json()
 
-# ============================================================
-# Prediction History
-# ============================================================
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": str(e)
+        }
+
 
 def get_prediction_history():
 
-    return safe_get(
-        "/api/predictions/history"
-    )
+    try:
+        response = requests.get(
+            f"{BASE_URL}/api/predictions/history",
+            timeout=60
+        )
 
+        response.raise_for_status()
+        return response.json()
 
-# ============================================================
-# Analytics
-# ============================================================
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": str(e)
+        }
+
 
 def get_analytics():
 
-    return safe_get(
-        "/api/analytics"
-    )
+    try:
+        response = requests.get(
+            f"{BASE_URL}/api/analytics",
+            timeout=60
+        )
 
+        response.raise_for_status()
+        return response.json()
 
-# ============================================================
-# Feedback
-# ============================================================
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": str(e)
+        }
+
 
 def get_feedback():
 
-    return safe_get(
-        "/api/feedback"
-    )
+    try:
+        response = requests.get(
+            f"{BASE_URL}/api/feedback",
+            timeout=60
+        )
+
+        response.raise_for_status()
+        return response.json()
+
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": str(e)
+        }
 
 
-# ============================================================
-# Submit Feedback
-# ============================================================
+def submit_feedback(data):
 
-def submit_feedback(
-    prediction_id,
-    rating,
-    feedback
-):
+    try:
+        response = requests.post(
+            f"{BASE_URL}/api/feedback",
+            json=data,
+            timeout=60
+        )
 
-    data = {
-        "prediction_id": prediction_id,
-        "rating": rating,
-        "feedback": feedback
-    }
+        response.raise_for_status()
+        return response.json()
 
-    return safe_post(
-        "/api/feedback",
-        data
-    )
+    except requests.exceptions.RequestException as e:
+        return {
+            "error": str(e)
+        }
