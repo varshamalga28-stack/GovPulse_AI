@@ -68,3 +68,23 @@ AI-Powered Government Complaint Management and Emergency Detection System.
 Frontend: https://govpulse-ai-2.onrender.com
 
 Backend: https://govpulse-ai-backend.onrender.com
+
+## 📸 Application Screenshots
+
+### 🏠 Dashboard
+![Dashboard](dashboard.png)
+
+### 🔮 Emergency Prediction
+![Prediction](prediction.png)
+
+### 📊 Analytics
+![Analytics](analytics.png)
+
+### 📈 Analytics Overview
+![Analytics Overview](Analytics1.png)
+
+### 🕒 Prediction History
+![Prediction History](history.png)
+
+### 💬 Feedback
+![Feedback](feedback.png)
